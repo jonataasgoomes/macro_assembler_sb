@@ -11,6 +11,7 @@ int main(int argc, char* argv[])
     for (int i = 1; i < argc; i++){
         std::cout << "Processando arquivo:" <<argv[i] << std::endl;
         processarArquivo(argv[i]);
+        std::cout << "Arquivo processado:" <<argv[i]<<"_processado" << std::endl;
     }
 
 
