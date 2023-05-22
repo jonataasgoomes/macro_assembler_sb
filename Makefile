@@ -7,7 +7,7 @@ INCDIR = include
 
 SRCS = $(wildcard $(SRCDIR)/*.cpp)
 OBJS = $(SRCS:.cpp=.o)
-EXEC = programa
+EXEC = montador
 
 all: $(EXEC)
 
