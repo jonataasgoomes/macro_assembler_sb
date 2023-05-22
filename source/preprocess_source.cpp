@@ -1,56 +1,84 @@
 #include <preprocess_source.h>
 
-void processarArquivo(const std::string& arquivo) {
-    std::ifstream arquivo_original(arquivo);
-    if (!arquivo_original.is_open()) {
-        // Imprime uma mensagem de erro se não for possível abrir o arquivo
-        std::cout << "Erro ao abrir o arquivo: " << arquivo << " Use ./montador <nome_arquivo>" << std::endl;
-        return;
-    }
+void processarArquivo(const std::string& nomeArquivo) {
+  std::ifstream arquivo(nomeArquivo);
 
-    std::ofstream arquivo_processado(arquivo + "_processado");
-
+  if (arquivo.is_open()) {
     std::string linha;
+    std::string nomeArquivoProcessado = nomeArquivo + "_processado";
+    std::ofstream arquivoProcessado(nomeArquivoProcessado);
 
-    while (std::getline(arquivo_original, linha)) {
-        size_t pos = linha.find(';');
-        if (pos != std::string::npos) {
-            linha = linha.substr(0, pos);
-        }
+    if (arquivoProcessado.is_open()) {
+      std::string rotulo;
+      bool concatenarLinha = false;
 
-        for (char& c : linha) {
-            c = std::toupper(static_cast<unsigned char>(c));
-        }
-
-        std::string linha_limpa;
-        bool espaco_anterior = false;
+      while (std::getline(arquivo, linha)) {
+        // Remover espaços e tabulações repetidos
+        std::string linhaSemEspacos;
+        bool espacoAnterior = false;
 
         for (char c : linha) {
-            if (c == ' ' || c == '\t') {
-                if (!espaco_anterior) {
-                    linha_limpa += ' ';
-                }
-                espaco_anterior = true;
-            } else {
-                linha_limpa += c;
-                espaco_anterior = false;
+          if (std::isspace(c)) {
+            if (!espacoAnterior) {
+              linhaSemEspacos += ' ';
+              espacoAnterior = true;
             }
+          } else {
+            linhaSemEspacos += c;
+            espacoAnterior = false;
+          }
         }
 
-        size_t pos_dois_pontos = linha_limpa.find(':');
-        if (pos_dois_pontos != std::string::npos) {
-            size_t pos_anterior = pos_dois_pontos - 1;
-            while (pos_anterior > 0 && (linha_limpa[pos_anterior] == ' ' || linha_limpa[pos_anterior] == '\t')) {
-                linha_limpa.erase(pos_anterior, 1);
-                pos_anterior--;
-            }
+        // Remover espaços antes do caractere ':'
+        size_t pos = linhaSemEspacos.find(':');
+        if (pos != std::string::npos) {
+          size_t espacosAntesDoRotulo = linhaSemEspacos.find_last_not_of(' ', pos - 1);
+          if (espacosAntesDoRotulo != std::string::npos) {
+            linhaSemEspacos.erase(espacosAntesDoRotulo + 1, pos - espacosAntesDoRotulo - 1);
+          }
+
+          // Verificar se a próxima linha deve ser concatenada
+          concatenarLinha = true;
+          rotulo = linhaSemEspacos;
+          continue;
         }
 
-        if (!linha_limpa.empty()) {
-            arquivo_processado << linha_limpa << std::endl;
+        if (concatenarLinha) {
+          // Concatenar linha atual com a anterior (rótulo)
+          linhaSemEspacos = rotulo + linhaSemEspacos;
+          concatenarLinha = false;
         }
+
+        // Verificar se a linha está vazia (contém apenas espaços em branco)
+        if (linhaSemEspacos.find_first_not_of(' ') == std::string::npos) {
+          continue; // Ignorar linha vazia e passar para a próxima
+        }
+
+        // Encontrar a posição do ponto e vírgula (;)
+        size_t posPontoEVirgula = linhaSemEspacos.find(';');
+
+        // Transformar a linha para maiúsculas
+        for (char& c : linhaSemEspacos) {
+          c = std::toupper(c);
+        }
+
+        // Remover tudo após o ponto e vírgula (;)
+        if (posPontoEVirgula != std::string::npos) {
+          linhaSemEspacos = linhaSemEspacos.substr(0, posPontoEVirgula);
+        }
+
+        // Escrever a linha transformada e truncada no arquivo processado
+        arquivoProcessado << linhaSemEspacos << std::endl;
+      }
+
+      arquivoProcessado.close();
+      std::cout << "Arquivo processado salvo como: " << nomeArquivoProcessado << std::endl;
+    } else {
+      std::cout << "Erro ao criar o arquivo processado." << std::endl;
     }
 
-    arquivo_original.close();
-    arquivo_processado.close();
+    arquivo.close();
+  } else {
+    std::cout << "Erro ao abrir o arquivo." << std::endl;
+  }
 }
