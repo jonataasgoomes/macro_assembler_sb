@@ -79,6 +79,6 @@ void processarArquivo(const std::string& nomeArquivo) {
 
     arquivo.close();
   } else {
-    cout << "Erro ao abrir o arquivo." << endl;
+    cout << "Erro ao abrir o arquivo: " <<nomeArquivo<< endl;
   }
 }
