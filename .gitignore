@@ -31,5 +31,5 @@
 *.out
 *.app
 
-# Asembler Files
+# Assembler Files
 *.asm

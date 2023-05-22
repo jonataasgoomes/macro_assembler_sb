@@ -5,7 +5,7 @@ void processarArquivo(const std::string& nomeArquivo) {
 
   if (arquivo.is_open()) {
     string linha;
-    string nomeArquivoProcessado = nomeArquivo + "_processado";
+    string nomeArquivoProcessado = nomeArquivo.substr(0, nomeArquivo.find_last_of('.')) + "_processado.asm";
     ofstream arquivoProcessado(nomeArquivoProcessado);
 
     if (arquivoProcessado.is_open()) {
