@@ -30,6 +30,3 @@
 *.exe
 *.out
 *.app
-
-# Assembler Files
-*.asm
