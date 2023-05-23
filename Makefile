@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -Wall -Wextra -pedantic -std=c++11
+CFLAGS = -Wall -Wextra -pedantic -std=c++17
 INCLUDES = -I include
 
 SRCDIR = source
