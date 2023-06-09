@@ -28,6 +28,8 @@ int main(int argc, char* argv[]) {
         else if(argc >= 2 || argc < 5)
         {   
             cout << "Montando o arquivo:" <<arquivo<<" para o ligador:"<< endl;
+            string arquivo_processado = arquivo.substr(0, arquivo.find_last_of(".")) + "_processado.asm";
+            montador(arquivo_processado);
         }
         else
         {

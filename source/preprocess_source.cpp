@@ -1,5 +1,6 @@
 #include "preprocess_source.h"
 
+
 void processarArquivo(const std::string& nomeArquivo) {
     std::ifstream arquivo(nomeArquivo);
 
@@ -46,6 +47,14 @@ void processarArquivo(const std::string& nomeArquivo) {
         // Verificar se a linha está vazia (contém apenas espaços em branco)
         if (linhaSemEspacos.find_first_not_of(' ') == std::string::npos) {
             continue; // Ignorar linha vazia e passar para a próxima
+        }
+
+        // Remover espaços em branco no início da linha
+        size_t primeiroNaoEspaco = linhaSemEspacos.find_first_not_of(' ');
+        if (primeiroNaoEspaco != std::string::npos) {
+            linhaSemEspacos = linhaSemEspacos.substr(primeiroNaoEspaco);
+        } else {
+            linhaSemEspacos.clear();
         }
 
         // Encontrar a posição do ponto e vírgula (;)

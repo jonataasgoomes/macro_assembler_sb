@@ -1,5 +1,8 @@
+#include <string>
+#include <vector>
 
 #include "asm_lib.h"
+
 
 int hexaParaDecimal(const std::string& numeroHexadecimal) {
     int numeroDecimal = 0;
