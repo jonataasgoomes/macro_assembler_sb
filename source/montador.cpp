@@ -6,7 +6,7 @@ struct Simbolo {
     int valor;
     bool definido;
     std::vector<int> lista;
-    bool externo; // Novo valor booleano externo
+    bool externo;
 };
 
 Simbolo criarSimbolo(std::string simbolo, int valor, bool definido, std::vector<int> lista, bool externo) {
@@ -15,7 +15,7 @@ Simbolo criarSimbolo(std::string simbolo, int valor, bool definido, std::vector<
     novoSimbolo.valor = valor;
     novoSimbolo.definido = definido;
     novoSimbolo.lista = lista;
-    novoSimbolo.externo = externo; // Atribuir o valor externo
+    novoSimbolo.externo = externo;
     return novoSimbolo;
 }
 
@@ -54,8 +54,6 @@ struct Diretiva {
     int operando;
 };
 
-
-
 void genMem(std::vector<std::string>& mem, const std::string& valor) {
     mem.push_back(valor);
 }
@@ -73,7 +71,6 @@ void attRef(std::vector<std::string>& mem, int valor, const std::vector<int>& li
         }
     }
 }
-
 
 void attDef(std::vector<Simbolo>& listaDeSimbolos, std::vector<Definicao>& listaDeDef) {
     for (const auto& simbolo : listaDeSimbolos) {
@@ -132,22 +129,16 @@ void montador(const std::string& nomeArquivo) {
     }
 
     std::string line;
-    int contadorEnd = 0;  // Inicializa o contadorEnd de endereços
-    int contadorLinhas = 0;  // Inicializa o contador de linhas
+    int contadorEnd = 0;
+    int contadorLinhas = 0;
     bool sectionTextFound = false;
-    //std::cout << std::endl;
     while (std::getline(file, line)) {
-
-        
-
-
-
         contadorLinhas++;
         if (!line.empty()) {
             std::istringstream iss(line);
             std::vector<std::string> tokens{std::istream_iterator<std::string>{iss},
                                             std::istream_iterator<std::string>{}};
-            std::cout << "(" << contadorLinhas << ") " << contadorEnd << ": " << line << std::endl;
+            //std::cout << "(" << contadorLinhas << ") " << contadorEnd << ": " << line << std::endl;
 
             std::string rotulo;
             std::string operador;
@@ -155,41 +146,28 @@ void montador(const std::string& nomeArquivo) {
             std::string operando2;
 
             if (!tokens.empty()) {
-
-
                 if (tokens[0] == "SECTION") {
-
-
-                    if (tokens[1] == "TEXT")
-                    {
+                    if (tokens[1] == "TEXT") {
                         sectionTextFound = true;
                     }
-
                     continue;
                 }
 
                 if (tokens.size() >= 2) {
                     if (tokens[1] == "CONST") {
-
-
-
-                        if(tokens[2].substr(0,2) == "0X"){
-                            tokens[2] = to_string(hexaParaDecimal(tokens[2]));
+                        if (tokens[2].substr(0, 2) == "0X") {
+                            tokens[2] = std::to_string(hexaParaDecimal(tokens[2]));
                             genMem(memoria, tokens[2]);
-
-                        }else{
+                        } else {
                             genMem(memoria, tokens[2]);
-
                         }
 
                         tokens[0].pop_back();
 
-
-                        for (auto& simbolo : listaDeSimbolos) { //procura o rotulo na lista de simbolos
-                            if (simbolo.simbolo == tokens[0]) {// se encontrar o simbolo igual o rotulo entra no if
+                        for (auto& simbolo : listaDeSimbolos) {
+                            if (simbolo.simbolo == tokens[0]) {
                                 simbolo.valor = contadorEnd;
                                 simbolo.definido = true;
-
                                 break;
                             }
                         }
@@ -198,7 +176,6 @@ void montador(const std::string& nomeArquivo) {
                     }
                 }
 
-                // Verifica se o primeiro elemento termina com ":" e o trata como rótulo
                 if (!tokens[0].empty() && tokens[0].back() == ':') {
                     rotulo = tokens[0];
                     if (tokens.size() > 1) {
@@ -217,13 +194,9 @@ void montador(const std::string& nomeArquivo) {
                     }
                 }
 
-
-                if (!rotulo.empty())
-                {
-                    rotulo.pop_back(); // retira o : do rotulo
+                if (!rotulo.empty()) {
+                    rotulo.pop_back();
                 }
-
-                
 
                 bool found = false;
                 for (const auto& instrucao : instrucoes) {
@@ -234,50 +207,26 @@ void montador(const std::string& nomeArquivo) {
                     }
                 }
 
-
-/*                        cout<<endl; 
-                        cout<<"Linha: " << contadorLinhas << endl; 
-                        cout<<"End: " << contadorEnd << endl; 
-                        cout<<"Rotulo: " << rotulo << endl; 
-                        cout<<"Operador: " << operador << endl; 
-                        cout<<"Operando: " << operando << endl; 
-                        cout<<"Operando2: " << operando2 << endl;*/
-
-
-
-
-                // Verifica se o operador existe na lista de diretivas, se não foi encontrado na lista de instruções
                 if (!found) {
                     for (const auto& diretiva : diretivas) {
-
-                        if(diretiva.nome == rotulo){
-
-                                found = true;
-                                break;
-
-                        }else if (diretiva.nome == operador) {
-
-                                if(operador == "SPACE"){
-
-                                    if(!operando.empty()){
-                                        genMem(memoria,operando);
-                                        found = true;
-                                    }else{
-                                        genMem(memoria,"00" );
-                                        found = true;
-                                    }
-
-                                    continue;
-
-                                    
-
-                                }
-
-                                if (operador == "BEGIN") {
+                        if (diretiva.nome == rotulo) {
+                            found = true;
+                            break;
+                        } else if (diretiva.nome == operador) {
+                            if (operador == "SPACE") {
+                                if (!operando.empty()) {
+                                    genMem(memoria, operando);
                                     found = true;
-                                    //std::cout << std::endl;
-                                    continue;
+                                } else {
+                                    genMem(memoria, "00");
+                                    found = true;
                                 }
+                                continue;
+                            }
+                            if (operador == "BEGIN") {
+                                found = true;
+                                continue;
+                            }
                             found = true;
                             break;
                         }
@@ -289,15 +238,11 @@ void montador(const std::string& nomeArquivo) {
                     continue;
                 }
 
-
-
-                if (!rotulo.empty()) { // rotulo não está vazio
-                    
-
+                if (!rotulo.empty()) {
                     bool rotuloEncontrado = false;
 
-                    for (auto& simbolo : listaDeSimbolos) { //procura o rotulo na lista de simbolos
-                        if (simbolo.simbolo == rotulo) {    // se encontrar o simbolo igual o rotulo entra no if
+                    for (auto& simbolo : listaDeSimbolos) {
+                        if (simbolo.simbolo == rotulo) {
                             simbolo.valor = contadorEnd;
                             simbolo.definido = true;
                             rotuloEncontrado = true;
@@ -305,108 +250,84 @@ void montador(const std::string& nomeArquivo) {
                         }
                     }
 
-                    if (!rotuloEncontrado) { //rotulo ainda não definido ?
-
-
-                                if (rotulo == "EXTERN") {
-                                    Simbolo novoSimbolo = criarSimbolo(operador, 0, true, {-1}, true);
-                                    listaDeSimbolos.push_back(novoSimbolo);
-                                } else{
-                                    Simbolo novoSimbolo = criarSimbolo(rotulo, contadorEnd, true, {-1}, false);
-                                    listaDeSimbolos.push_back(novoSimbolo);
-                                }
-
-
-
-
-
-
+                    if (!rotuloEncontrado) {
+                        if (rotulo == "EXTERN") {
+                            Simbolo novoSimbolo = criarSimbolo(operador, 0, true, {-1}, true);
+                            listaDeSimbolos.push_back(novoSimbolo);
+                        } else {
+                            Simbolo novoSimbolo = criarSimbolo(rotulo, contadorEnd, true, {-1}, false);
+                            listaDeSimbolos.push_back(novoSimbolo);
+                        }
                     }
                 }
 
-
-                if (!operando.empty()) { //operando não está vazio
-
-                    // Verifica se o operando já existe na lista de símbolos
-
+                if (!operando.empty()) {
                     bool operandoEncontrado = false;
 
-                    for (auto& simbolo : listaDeSimbolos) { //procura o operando na lista de simbolos
-                        if (simbolo.simbolo == operando) {  //operando encontrado
-                            if (!simbolo.definido) {        //simbolo não definido ?
-                                simbolo.lista.insert(simbolo.lista.begin(), contadorEnd + 1); //adiciona o valor do contador na lista de simbolos
-                                genMem(memoria, "-"); //gera instrução de maquina
+                    for (auto& simbolo : listaDeSimbolos) {
+                        if (simbolo.simbolo == operando) {
+                            if (!simbolo.definido) {
+                                simbolo.lista.insert(simbolo.lista.begin(), contadorEnd + 1);
+                                genMem(memoria, "-");
                             } else {
-
-                                if(simbolo.externo){
-                                    anotarUso(listaDeUso,operando, contadorEnd + 1);
+                                if (simbolo.externo) {
+                                    anotarUso(listaDeUso, operando, contadorEnd + 1);
                                 }
 
-                                if(operador == "PUBLIC"){
-                                    Definicao novaDefinicao = criarDefinicao(operando,0);
+                                if (operador == "PUBLIC") {
+                                    Definicao novaDefinicao = criarDefinicao(operando, 0);
                                     listaDeDef.push_back(novaDefinicao);
-                                }else
-                                {
-                                  genMem(memoria, std::to_string(simbolo.valor));  
+                                } else {
+                                    genMem(memoria, std::to_string(simbolo.valor));
                                 }
-
                             }
                             relativos.push_back(contadorEnd + 1);
                             operandoEncontrado = true;
                         }
                     }
 
-                    for (auto& simbolo : listaDeSimbolos) { // procura o operando na lista de simbolos
-                        if (simbolo.simbolo == operando2) { //operando 2 existe
-                            if (!simbolo.definido) { // simbolo definido == false
+                    for (auto& simbolo : listaDeSimbolos) {
+                        if (simbolo.simbolo == operando2) {
+                            if (!simbolo.definido) {
                                 simbolo.lista.insert(simbolo.lista.begin(), contadorEnd + 2);
-                                genMem(memoria, "-"); //gera instrução de maquina
+                                genMem(memoria, "-");
                             }
                             operandoEncontrado = true;
                             break;
                         }
                     }
 
-                    if (!operandoEncontrado) { // operando não encontrado
-                        // Adiciona um novo símbolo à lista de símbolos
-                        Simbolo novoSimbolo = criarSimbolo(operando, 0, false, {contadorEnd + 1, -1}, false); //cria o simbolo
-                        listaDeSimbolos.push_back(novoSimbolo); //adiciona na tabela de simbolo
+                    if (!operandoEncontrado) {
+                        Simbolo novoSimbolo = criarSimbolo(operando, 0, false, {contadorEnd + 1, -1}, false);
+                        listaDeSimbolos.push_back(novoSimbolo);
 
-
-                        if(operador == "PUBLIC"){
-                            Definicao novaDefinicao = criarDefinicao(operando,0);
+                        if (operador == "PUBLIC") {
+                            Definicao novaDefinicao = criarDefinicao(operando, 0);
                             listaDeDef.push_back(novaDefinicao);
-                        }else{
-                            genMem(memoria, "-"); //gera instrução de maquina
+                        } else {
+                            genMem(memoria, "-");
                         }
 
-
-                        if (operador == "COPY") { //se a instrução for COPY ela tera um segundo operando
-                            Simbolo novoSimbolo = criarSimbolo(operando2, 0, false, {contadorEnd + 2, -1}, false); // cria o simbolo do 2 operando
-                            listaDeSimbolos.push_back(novoSimbolo); //adiciona o segundo operando
-                            genMem(memoria, "-"); //gera instrução de maquina
+                        if (operador == "COPY") {
+                            Simbolo novoSimbolo = criarSimbolo(operando2, 0, false, {contadorEnd + 2, -1}, false);
+                            listaDeSimbolos.push_back(novoSimbolo);
+                            genMem(memoria, "-");
                         }
                     }
                 }
 
-
-
-                // Atualiza o contadorEnd de acordo com a lógica de incremento adequada
-                if(operador == "BEGIN" || rotulo == "EXTERN" || operador == "PUBLIC"){
+                if (operador == "BEGIN" || rotulo == "EXTERN" || operador == "PUBLIC") {
                     contadorEnd = 0;
-                }else if (operador == "STOP") {
-                    //std::cout << std::endl;
+                } else if (operador == "STOP") {
                     contadorEnd += 1;
-                }else if (operador == "COPY") {
+                } else if (operador == "COPY") {
                     contadorEnd += 3;
                 } else if (operador == "CONST" || operador == "SPACE") {
-
-                    if(operador == "SPACE" && (!operando.empty())){
-                        contadorEnd += stoi(operando);
-                    }else{
+                    if (operador == "SPACE" && (!operando.empty())) {
+                        contadorEnd += std::stoi(operando);
+                    } else {
                         contadorEnd += 1;
                     }
-                    
                 } else {
                     contadorEnd += 2;
                 }
@@ -417,11 +338,8 @@ void montador(const std::string& nomeArquivo) {
     file.close();
 
     if (!sectionTextFound) {
-        // Error: "SECTION TEXT" not found
         std::cerr << "ERRO SEMANTICO SECTION TEXT NAO ENCONTRADO" << std::endl;
     }
-
-
 
     for (auto& simbolo : listaDeSimbolos) {
         attRef(memoria, simbolo.valor, simbolo.lista);
@@ -429,7 +347,7 @@ void montador(const std::string& nomeArquivo) {
 
     attDef(listaDeSimbolos, listaDeDef);
 
-    std::cout << std::endl;
+/*    std::cout << std::endl;
 
     std::cout << std::left << std::setw(10) << "Simbolo"
               << std::setw(10) << "Valor"
@@ -457,27 +375,61 @@ void montador(const std::string& nomeArquivo) {
     for (const auto& uso : listaDeUso) {
         std::cout << uso.simbolo << " " << uso.valor << std::endl;
     }
-    
+
     std::cout << "DEF" << std::endl;
     for (const auto& definicao : listaDeDef) {
-        std::cout << definicao.simbolo<<" "<<definicao.valor<< std::endl;
+        std::cout << definicao.simbolo << " " << definicao.valor << std::endl;
     }
 
     std::cout << "RELATIVOS" << std::endl;
-
     for (std::vector<int>::size_type i = 0; i < relativos.size(); i++) {
         std::cout << relativos[i] << " ";
     }
     std::cout << std::endl;
 
     std::cout << "CODE" << std::endl;
-        for (std::vector<int>::size_type i = 0; i < memoria.size(); i++) {
+    for (std::vector<int>::size_type i = 0; i < memoria.size(); i++) {
         std::cout << memoria[i] << " ";
     }
     std::cout << std::endl;
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 
+    // Escrever o arquivo objeto com a extensão .obj
+    std::size_t found = nomeArquivo.find("_processado.asm");
+    std::string nomeArquivoObj;
+    if (found != std::string::npos) {
+        nomeArquivoObj = nomeArquivo.substr(0, found) + ".obj";
+    } else {
+        nomeArquivoObj = nomeArquivo + ".obj";
+    }
+    std::ofstream arquivoObj(nomeArquivoObj);
 
+    if (!arquivoObj) {
+        std::cerr << "Erro ao criar o arquivo objeto." << std::endl;
+        return;
+    }
 
+    arquivoObj << "USO" << std::endl;
+    for (const auto& uso : listaDeUso) {
+        arquivoObj << uso.simbolo << " " << uso.valor << std::endl;
+    }
 
+    arquivoObj << "DEF" << std::endl;
+    for (const auto& definicao : listaDeDef) {
+        arquivoObj << definicao.simbolo << " " << definicao.valor << std::endl;
+    }
+
+    arquivoObj << "RELATIVO" << std::endl;
+    for (std::vector<int>::size_type i = 0; i < relativos.size(); i++) {
+        arquivoObj << relativos[i] << " ";
+    }
+    arquivoObj << std::endl;
+
+    arquivoObj << "CODE" << std::endl;
+    for (std::vector<int>::size_type i = 0; i < memoria.size(); i++) {
+        arquivoObj << memoria[i] << " ";
+    }
+    arquivoObj << std::endl;
+
+    arquivoObj.close();
 }
