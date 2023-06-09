@@ -1,31 +1,38 @@
 #include "preprocess_source.h"
+
 void processarArquivo(const std::string& nomeArquivo) {
-    ifstream arquivo(nomeArquivo);
+    std::ifstream arquivo(nomeArquivo);
 
     if (!arquivo.is_open()) {
-        cout << "Erro ao abrir o arquivo: " << nomeArquivo << endl;
+        std::cout << "Erro ao abrir o arquivo: " << nomeArquivo << std::endl;
         return;
     }
 
-    string linha;
-    string nomeArquivoProcessado = nomeArquivo.substr(0, nomeArquivo.find_last_of('.')) + "_processado.asm";
-    ofstream arquivoProcessado(nomeArquivoProcessado);
+    std::string linha;
+    std::string nomeArquivoProcessado = nomeArquivo.substr(0, nomeArquivo.find_last_of('.')) + "_processado.asm";
+    std::ofstream arquivoProcessado(nomeArquivoProcessado);
 
     if (!arquivoProcessado.is_open()) {
-        cout << "Erro ao criar o arquivo processado." << endl;
+        std::cout << "Erro ao criar o arquivo processado." << std::endl;
         return;
     }
 
-    string rotulo;
+    std::string rotulo;
     bool rotuloEncontrado = false;
 
     while (std::getline(arquivo, linha)) {
+        // Remover a vírgula do token "COPY"
+        size_t posVirgula = linha.find(',');
+        if (posVirgula != std::string::npos) {
+            linha.erase(posVirgula, 1);
+        }
+
         // Remover espaços e tabulações repetidos
-        string linhaSemEspacos;
+        std::string linhaSemEspacos;
         bool espacoAnterior = false;
 
         for (char c : linha) {
-            if (isspace(c)) {
+            if (std::isspace(c)) {
                 if (!espacoAnterior) {
                     linhaSemEspacos += ' ';
                     espacoAnterior = true;
@@ -37,7 +44,7 @@ void processarArquivo(const std::string& nomeArquivo) {
         }
 
         // Verificar se a linha está vazia (contém apenas espaços em branco)
-        if (linhaSemEspacos.find_first_not_of(' ') == string::npos) {
+        if (linhaSemEspacos.find_first_not_of(' ') == std::string::npos) {
             continue; // Ignorar linha vazia e passar para a próxima
         }
 
@@ -50,13 +57,13 @@ void processarArquivo(const std::string& nomeArquivo) {
         }
 
         // Remover tudo após o ponto e vírgula (;)
-        if (posPontoEVirgula != string::npos) {
+        if (posPontoEVirgula != std::string::npos) {
             linhaSemEspacos = linhaSemEspacos.substr(0, posPontoEVirgula);
         }
 
         // Remover espaços em branco finais
         size_t ultimoNaoEspaco = linhaSemEspacos.find_last_not_of(' ');
-        if (ultimoNaoEspaco != string::npos) {
+        if (ultimoNaoEspaco != std::string::npos) {
             linhaSemEspacos.erase(ultimoNaoEspaco + 1);
         } else {
             linhaSemEspacos.clear();
@@ -64,7 +71,7 @@ void processarArquivo(const std::string& nomeArquivo) {
 
         // Checar se encontramos um rótulo
         size_t pos = linhaSemEspacos.find(':');
-        if (pos != string::npos && pos == linhaSemEspacos.size() - 1) {
+        if (pos != std::string::npos && pos == linhaSemEspacos.size() - 1) {
             rotulo = linhaSemEspacos;
             rotuloEncontrado = true;
             continue;
@@ -81,6 +88,6 @@ void processarArquivo(const std::string& nomeArquivo) {
     }
 
     arquivoProcessado.close();
-    cout << "Arquivo processado salvo como: " << nomeArquivoProcessado << endl;
+    std::cout << "Arquivo processado salvo como: " << nomeArquivoProcessado << std::endl;
     arquivo.close();
 }
