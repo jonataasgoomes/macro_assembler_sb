@@ -1,4 +1,5 @@
-#include <preprocess_source.h>
+#include "preprocess_source.h"
+
 
 int main(int argc, char* argv[]) {
     if (argc < 2 || argc > 5) {
@@ -16,7 +17,28 @@ int main(int argc, char* argv[]) {
         }
         
         processarArquivo(arquivo);
+        
+        if (argc == 2)
+        {
+            cout << "Montando arquivo direto: " <<arquivo<< endl;
+            string arquivo_processado = arquivo.substr(0, arquivo.find_last_of(".")) + "_processado.asm";
+            montador(arquivo_processado);
+            cout << "Arquivo: "<<arquivo<<" Montado"<<endl;
+        }
+        else if(argc >= 2 || argc < 5)
+        {   
+            cout << "Montando o arquivo:" <<arquivo<<" para o ligador:"<< endl;
+            string arquivo_processado = arquivo.substr(0, arquivo.find_last_of(".")) + "_processado.asm";
+            montador(arquivo_processado);
+        }
+        else
+        {
+            cout << "Numero de arquivos incorreto" << endl;
+        }
+
     }
 
+    
+    
     return 0;
 }
