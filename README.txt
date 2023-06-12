@@ -1,15 +1,29 @@
 Alunos:
-140146407 - Jônatas Gomes Pinto Júnio
+140146407 - Jônatas Gomes Pinto Júnior
 130115428 - ITALO FRANKLIN CARDOSO VAZ
 
-Código feito no editor sublime text 3 usando GCC no terminal.
+Código feito no Editor Sublime Text 3 (usando GCC no terminal.)
 
-Testado em WINDOWS E MAC - Abrir terminal na pasta com arquivo make.
+Testado em WINDOWS E MAC:
 
-MAKE - para compilar
 
-MONTADOR ENTRADAS 1 até 4 no formato:
-./montador NOME1 NOME2 NOME3 NOME4   -> saída OBJ
+COMO COMPILAR:
+
+MONTADOR:
+Abrir terminal na pasta com arquivo make para o montador usar comando make.
+
+LIGADOR
+Usar comando na pasta do ligador para compilar o linker.
+
+Comando para compilar o ligador:
+g++ -std=c++17 linker.cpp -o linker	
+
+
+MONTADOR ENTRADAS 1 até 4 arquivos no formato:
+./montador NOME1 NOME2 NOME3 NOME4 -> saída OBJ
+
+LIGADOR ENTRADAS 1 até 4 no formato:
+./linker NOME1.obj NOME2.obj NOME3.obj NOME4.obj -> saída EXC
 
     instrucoes usadas
         {"ADD", "1", 2},

@@ -262,29 +262,36 @@ void montador(const std::string& nomeArquivo) {
                 }
 
                 if (!operando.empty()) {
-                    bool operandoEncontrado = false;
 
+                    bool operandoEncontrado = false;
                     for (auto& simbolo : listaDeSimbolos) {
+
                         if (simbolo.simbolo == operando) {
                             if (!simbolo.definido) {
                                 simbolo.lista.insert(simbolo.lista.begin(), contadorEnd + 1);
                                 genMem(memoria, "-");
+                                relativos.push_back(contadorEnd + 1);
+
                             } else {
                                 if (simbolo.externo) {
                                     anotarUso(listaDeUso, operando, contadorEnd + 1);
                                 }
+                                
 
                                 if (operador == "PUBLIC") {
                                     Definicao novaDefinicao = criarDefinicao(operando, 0);
                                     listaDeDef.push_back(novaDefinicao);
                                 } else {
                                     genMem(memoria, std::to_string(simbolo.valor));
+                                    
                                 }
+                                relativos.push_back(contadorEnd + 1);
                             }
-                            relativos.push_back(contadorEnd + 1);
                             operandoEncontrado = true;
                         }
+
                     }
+
 
                     for (auto& simbolo : listaDeSimbolos) {
                         if (simbolo.simbolo == operando2) {
@@ -292,6 +299,7 @@ void montador(const std::string& nomeArquivo) {
                                 simbolo.lista.insert(simbolo.lista.begin(), contadorEnd + 2);
                                 genMem(memoria, "-");
                             }
+                            
                             operandoEncontrado = true;
                             break;
                         }
@@ -314,7 +322,11 @@ void montador(const std::string& nomeArquivo) {
                             genMem(memoria, "-");
                         }
                     }
+
+                    
                 }
+
+                
 
                 if (operador == "BEGIN" || rotulo == "EXTERN" || operador == "PUBLIC") {
                     contadorEnd = 0;
@@ -347,9 +359,9 @@ void montador(const std::string& nomeArquivo) {
 
     attDef(listaDeSimbolos, listaDeDef);
 
-/*    std::cout << std::endl;
+   std::cout << std::endl;
 
-    std::cout << std::left << std::setw(10) << "Simbolo"
+    /*std::cout << std::left << std::setw(10) << "Simbolo"
               << std::setw(10) << "Valor"
               << std::setw(12) << "Def"
               << std::setw(10) << "Externo"
@@ -369,7 +381,7 @@ void montador(const std::string& nomeArquivo) {
 
         std::cout << std::endl;
     }
-    std::cout << std::endl;
+    std::cout << std::endl;*/
 
     std::cout << "USO" << std::endl;
     for (const auto& uso : listaDeUso) {
@@ -392,7 +404,9 @@ void montador(const std::string& nomeArquivo) {
         std::cout << memoria[i] << " ";
     }
     std::cout << std::endl;
-    std::cout << std::endl;*/
+    std::cout << std::endl;
+
+
 
     // Escrever o arquivo objeto com a extensão .obj
     std::size_t found = nomeArquivo.find("_processado.asm");
@@ -420,6 +434,9 @@ void montador(const std::string& nomeArquivo) {
     }
 
     arquivoObj << "RELATIVO" << std::endl;
+    std::sort(relativos.begin(), relativos.end());
+    relativos.erase(std::unique(relativos.begin(), relativos.end()), relativos.end());
+
     for (std::vector<int>::size_type i = 0; i < relativos.size(); i++) {
         arquivoObj << relativos[i] << " ";
     }

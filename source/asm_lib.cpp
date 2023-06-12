@@ -29,12 +29,5 @@ int hexaParaDecimal(const std::string& numeroHexadecimal) {
     return numeroDecimal;
 }
 
-int buscaSequencial(const std::vector<int>& vetor, int elemento) {
-    for (std::vector<int>::size_type i = 0; i < vetor.size(); i++) {
-        if (vetor[i] == elemento) {
-            return static_cast<int>(i);  // Elemento encontrado, retorna o índice
-        }
-    }
-    return -1;  // Elemento não encontrado, retorna -1
-}
+
 
